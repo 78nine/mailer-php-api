@@ -27,8 +27,13 @@ function send_email($config) {
   if (isset($config['message_plain'])) {
     $mail->AltBody = $config['message_plain'];
   }
-  if (isset($_FILES['attachment'])) {
-    $mail->addAttachment($_FILES['attachment']['tmp_name'], $_FILES['attachment']['name'], 'base64', $_FILES['attachment']['type']);
+  if (isset($config['attachments']) && is_array($config['attachments'])) {
+    foreach ($config['attachments'] as $attachment) {
+      if (isset($attachment['content']) && isset($attachment['filename'])) {
+        $decoded = base64_decode($attachment['content']);
+        $mail->addStringAttachment($decoded, $attachment['filename'], 'base64', $attachment['type'] ?? '');
+      }
+    }
   }
 
   $success = $mail->send();
@@ -55,6 +60,16 @@ if ($ini_config['api_token'] !== get_bearer_token()) {
   exit;
 }
 
+// Parse JSON request body
+$request_body = file_get_contents('php://input');
+$request_data = json_decode($request_body, true);
+
+if ($request_data === null && json_last_error() !== JSON_ERROR_NONE) {
+  http_response_code(400);
+  echo json_encode(['error' => 'Invalid JSON: ' . json_last_error_msg()]);
+  exit;
+}
+
 $mail_config_keys = [
   'to_email',
   'subject',
@@ -72,21 +87,30 @@ $mail_config = [];
 $missing_field_names = [];
 
 foreach ($mail_config_keys as $key) {
-  if ($key === 'message_plain' && !isset($_POST[$key])) {
+  if ($key === 'message_plain' && !isset($request_data[$key])) {
     continue;
   }
-  if (!isset($_POST[$key]) && !isset($ini_config[$key])) {
+  if (!isset($request_data[$key]) && !isset($ini_config[$key])) {
     $missing_field_names[] = $key;
     continue;
   }
-  $mail_config[$key] = trim($_POST[$key] ?? $ini_config[$key]);
+  $mail_config[$key] = trim($request_data[$key] ?? $ini_config[$key]);
+}
+
+// Handle attachments from JSON (optional)
+if (isset($request_data['attachments'])) {
+  $mail_config['attachments'] = $request_data['attachments'];
 }
 
 if (sizeof($missing_field_names) > 0) {
   $missing_field_names_str = implode(', ', $missing_field_names);
   http_response_code(400);
-  echo "Missing field names: '{$missing_field_names_str}'";
+  echo json_encode(['error' => "Missing fields: {$missing_field_names_str}"]);
   exit;
 }
 
-http_response_code(send_email($mail_config) ? 200 : 400);
+$result = send_email($mail_config);
+http_response_code($result ? 200 : 400);
+if ($result) {
+  echo json_encode(['success' => true, 'message' => 'Email sent successfully']);
+}

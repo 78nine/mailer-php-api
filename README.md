@@ -85,6 +85,13 @@ Mailer Error: SMTP Error: Could not authenticate.
 (Empty response body)
 ```
 
+**405 Method Not Allowed** - Non-POST request
+```json
+{
+  "error": "Method not allowed. Use POST."
+}
+```
+
 **500 Internal Server Error** - Server configuration error
 ```text
 (Empty response body)

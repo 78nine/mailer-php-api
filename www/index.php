@@ -2,6 +2,14 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
+// Restrict to POST requests only
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+  http_response_code(405);
+  header('Allow: POST');
+  echo json_encode(['error' => 'Method not allowed. Use POST.']);
+  exit;
+}
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 

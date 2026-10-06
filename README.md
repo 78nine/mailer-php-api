@@ -39,6 +39,23 @@ max_total_attachments_size = 20971520  ; 20MB total (in bytes)
 - Single attachment: 10MB
 - Total attachments: 20MB
 
+### CORS (Cross-Origin Resource Sharing)
+
+If you need to call the API from web browsers on different domains, enable CORS:
+
+```ini
+[general]
+cors_enabled = true
+cors_origin = *  ; Allow all origins (or specify: https://yourdomain.com)
+```
+
+**Default**: CORS is disabled for security.
+
+**Note**: When enabled, the API will:
+- Accept preflight OPTIONS requests
+- Return appropriate `Access-Control-*` headers
+- Allow requests from specified origin(s)
+
 ## API Reference
 
 ### Request Format

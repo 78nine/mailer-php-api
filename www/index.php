@@ -2,6 +2,29 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
+// Load configuration early for CORS
+$config_filename = 'config.ini';
+$ini_config = parse_ini_file($config_filename, FALSE);
+if ($ini_config === FALSE) {
+  http_response_code(500);
+  exit;
+}
+
+// CORS headers (if enabled)
+if (isset($ini_config['cors_enabled']) && $ini_config['cors_enabled']) {
+  $allowed_origin = isset($ini_config['cors_origin']) ? $ini_config['cors_origin'] : '*';
+  header('Access-Control-Allow-Origin: ' . $allowed_origin);
+  header('Access-Control-Allow-Methods: POST, OPTIONS');
+  header('Access-Control-Allow-Headers: Content-Type, Authorization');
+  header('Access-Control-Max-Age: 86400');
+  
+  // Handle preflight OPTIONS request
+  if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+  }
+}
+
 // Restrict to POST requests only
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   http_response_code(405);
@@ -71,13 +94,6 @@ function send_email($config) {
     echo "Mailer Error: {$mail->ErrorInfo}";
   }
   return $success;
-}
-
-$config_filename = 'config.ini';
-$ini_config = parse_ini_file($config_filename, FALSE);
-if ($ini_config === FALSE) {
-  http_response_code(500);
-  exit;
 }
 
 if (!isset($ini_config['api_token'])) {

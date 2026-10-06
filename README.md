@@ -25,6 +25,20 @@ rate_limit_window = 60     ; Time window in seconds
 
 Rate limiting can be disabled by setting `rate_limit_enabled = false`.
 
+### Attachment Size Limits
+
+To prevent abuse and memory exhaustion, attachment sizes are limited:
+
+```ini
+[general]
+max_attachment_size = 10485760         ; 10MB per attachment (in bytes)
+max_total_attachments_size = 20971520  ; 20MB total (in bytes)
+```
+
+**Defaults**:
+- Single attachment: 10MB
+- Total attachments: 20MB
+
 ## API Reference
 
 ### Request Format
@@ -125,6 +139,20 @@ Mailer Error: SMTP Error: Could not authenticate.
 ```json
 {
   "error": "Method not allowed. Use POST."
+}
+```
+
+**413 Payload Too Large** - Attachment size exceeded
+```json
+{
+  "error": "Attachment too large. Maximum size: 10MB",
+  "attachment_index": 0
+}
+```
+or
+```json
+{
+  "error": "Total attachments size too large. Maximum: 20MB"
 }
 ```
 

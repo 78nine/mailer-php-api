@@ -18,6 +18,7 @@ require 'PHPMailer/src/PHPMailer.php';
 require 'PHPMailer/src/SMTP.php';
 
 require_once('auth.php');
+require_once('rate_limit.php');
 
 function send_email($config) {
   // echo print_r($config, true);
@@ -78,6 +79,30 @@ if (!isset($ini_config['api_token'])) {
 if ($ini_config['api_token'] !== get_bearer_token()) {
   http_response_code(401);
   exit;
+}
+
+// Rate limiting
+$rate_limit_enabled = isset($ini_config['rate_limit_enabled']) ? (bool)$ini_config['rate_limit_enabled'] : true;
+if ($rate_limit_enabled) {
+  $max_requests = isset($ini_config['rate_limit_max']) ? (int)$ini_config['rate_limit_max'] : 10;
+  $time_window = isset($ini_config['rate_limit_window']) ? (int)$ini_config['rate_limit_window'] : 60;
+  
+  $rate_check = check_rate_limit($max_requests, $time_window);
+  
+  if (!$rate_check['allowed']) {
+    http_response_code(429);
+    header('Retry-After: ' . $rate_check['retry_after']);
+    echo json_encode([
+      'error' => 'Too many requests. Please try again later.',
+      'retry_after' => $rate_check['retry_after']
+    ]);
+    exit;
+  }
+  
+  // Cleanup old rate limit files occasionally (1% chance)
+  if (rand(1, 100) === 1) {
+    cleanup_rate_limit_files();
+  }
 }
 
 // Parse JSON request body

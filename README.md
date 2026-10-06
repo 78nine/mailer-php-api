@@ -8,6 +8,23 @@ Send emails using an HTTP PHP API using PHPMailer.
 - Make sure to rename `config.template.ini` to `config.ini` and set the fields.
 - Make sure `config.ini` is inaccessible through the web, .htaccess does this already for Apache servers.
 
+## Configuration
+
+### Rate Limiting
+
+The API includes built-in rate limiting to prevent abuse. Configure in `config.ini`:
+
+```ini
+[general]
+rate_limit_enabled = true
+rate_limit_max = 10        ; Maximum requests
+rate_limit_window = 60     ; Time window in seconds
+```
+
+**Default**: 10 requests per 60 seconds per IP address.
+
+Rate limiting can be disabled by setting `rate_limit_enabled = false`.
+
 ## API Reference
 
 ### Request Format
@@ -91,6 +108,15 @@ Mailer Error: SMTP Error: Could not authenticate.
   "error": "Method not allowed. Use POST."
 }
 ```
+
+**429 Too Many Requests** - Rate limit exceeded
+```json
+{
+  "error": "Too many requests. Please try again later.",
+  "retry_after": 45
+}
+```
+Headers: `Retry-After: 45`
 
 **500 Internal Server Error** - Server configuration error
 ```text

@@ -262,3 +262,48 @@ fetch('https://example.com/mailer/', options)
   .then(result => console.log('Success:', result))
   .catch(err => console.error('Error:', err.message));
 ```
+
+## UTF-8 Support
+
+The API fully supports UTF-8 content:
+
+- ✓ JSON request body (UTF-8 by default)
+- ✓ PHPMailer configured with UTF-8 charset
+- ✓ JSON responses with UTF-8 charset header
+
+### UTF-8 Example
+
+```javascript
+const data = {
+  to_email: 'recipient@example.com',
+  subject: '🎉 Welcome! Bienvenue! 欢迎!',
+  message_html: `
+    <h1>Hello World! 👋</h1>
+    <p>Testing various scripts:</p>
+    <ul>
+      <li>English: Hello</li>
+      <li>French: Bonjour, café, naïve</li>
+      <li>Spanish: Hola, ¿Qué tal?</li>
+      <li>German: Guten Tag, Björk</li>
+      <li>Chinese: 你好世界</li>
+      <li>Arabic: مرحبا بالعالم</li>
+      <li>Russian: Привет мир</li>
+      <li>Emoji: 😀 ❤️ 🎉 ✨ 🚀</li>
+    </ul>
+  `,
+  message_plain: 'Hello World! 你好世界 مرحبا Привет 😀'
+};
+
+fetch('https://example.com/mailer/', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Authorization': 'Bearer API_TOKEN_GOES_HERE'
+  },
+  body: JSON.stringify(data)
+})
+  .then(response => response.json())
+  .then(result => console.log(result));
+```
+
+All characters will be properly encoded and displayed in email clients.

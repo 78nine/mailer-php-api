@@ -1,5 +1,7 @@
 <?php
 
+header('Content-Type: application/json; charset=utf-8');
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -13,6 +15,7 @@ function send_email($config) {
   // echo print_r($config, true);
   $mail = new PHPMailer;
   $mail->isSMTP();
+  $mail->CharSet = PHPMailer::CHARSET_UTF8;
   $mail->SMTPDebug = 0; // 0 = off (for production use) - 1 = client messages - 2 = client and server messages
   $mail->Host = $config['smtp_host']; // use $mail->Host = gethostbyname('smtp.gmail.com'); // if your network does not support SMTP over IPv6
   $mail->Port = $config['smtp_port']; // TLS only

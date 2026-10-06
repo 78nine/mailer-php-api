@@ -2,6 +2,14 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
+// Security headers
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('X-XSS-Protection: 1; mode=block');
+header('Referrer-Policy: no-referrer');
+header('Content-Security-Policy: default-src \'none\'');
+header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+
 // Load configuration early for CORS
 $config_filename = 'config.ini';
 $ini_config = parse_ini_file($config_filename, FALSE);
@@ -23,6 +31,9 @@ if (isset($ini_config['cors_enabled']) && $ini_config['cors_enabled']) {
     http_response_code(204);
     exit;
   }
+} else {
+  // If CORS is disabled, add additional security
+  header('X-Permitted-Cross-Domain-Policies: none');
 }
 
 // Restrict to POST requests only

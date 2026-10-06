@@ -56,6 +56,41 @@ cors_origin = *  ; Allow all origins (or specify: https://yourdomain.com)
 - Return appropriate `Access-Control-*` headers
 - Allow requests from specified origin(s)
 
+## Security Features
+
+The API includes multiple security layers:
+
+### Authentication
+- Bearer token authentication required for all requests
+- Token configured in `config.ini` (protected by `.htaccess`)
+
+### Rate Limiting
+- Default: 10 requests per 60 seconds per IP
+- Prevents abuse and spam
+- Returns 429 with `Retry-After` header when exceeded
+
+### Input Validation
+- Email address validation (RFC-compliant)
+- Attachment size limits
+- JSON schema validation
+- POST-only requests (405 for other methods)
+
+### Security Headers
+The following security headers are automatically set:
+
+- `X-Content-Type-Options: nosniff` - Prevent MIME type sniffing
+- `X-Frame-Options: DENY` - Prevent clickjacking
+- `X-XSS-Protection: 1; mode=block` - Enable XSS filter
+- `Referrer-Policy: no-referrer` - Don't leak referrer information
+- `Content-Security-Policy: default-src 'none'` - Restrict resource loading
+- `Strict-Transport-Security: max-age=31536000` - Force HTTPS
+- `X-Permitted-Cross-Domain-Policies: none` - Restrict Flash/PDF policies (when CORS disabled)
+
+### File Protection
+- `.htaccess` blocks direct access to all files except `index.php`
+- `config.ini` protected from web access
+- Authorization header properly forwarded
+
 ## API Reference
 
 ### Request Format

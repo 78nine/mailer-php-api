@@ -31,6 +31,10 @@ Send emails using an HTTP PHP API using PHPMailer.
 
 **Optional Fields**:
 - `message_plain` - Plain text alternative body
+- `bcc` - BCC recipient(s). Can be:
+  - Single email: `"bcc@example.com"`
+  - Multiple emails (string): `"bcc1@example.com, bcc2@example.com"`
+  - Multiple emails (array): `["bcc1@example.com", "bcc2@example.com"]`
 - `attachments` - Array of attachment objects (see examples below)
 
 **Attachment Object Format**:
@@ -212,6 +216,51 @@ fetch('https://example.com/mailer/', {
 })
   .then(response => response.json())
   .then(result => console.log(result));
+```
+
+### With BCC Recipients
+
+```javascript
+// Single BCC recipient
+const data1 = {
+  to_email: 'recipient@example.com',
+  subject: 'Email with BCC',
+  message_html: '<p>Main recipient sees this</p>',
+  bcc: 'hidden@example.com'
+};
+
+// Multiple BCC recipients (string format)
+const data2 = {
+  to_email: 'recipient@example.com',
+  subject: 'Email with multiple BCCs',
+  message_html: '<p>Main recipient sees this</p>',
+  bcc: 'bcc1@example.com, bcc2@example.com, bcc3@example.com'
+};
+
+// Multiple BCC recipients (array format)
+const data3 = {
+  to_email: 'recipient@example.com',
+  subject: 'Email with multiple BCCs',
+  message_html: '<p>Main recipient sees this</p>',
+  bcc: ['bcc1@example.com', 'bcc2@example.com', 'bcc3@example.com']
+};
+
+fetch('https://example.com/mailer/', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer API_TOKEN_GOES_HERE'
+  },
+  body: JSON.stringify(data3)
+})
+  .then(response => response.json())
+  .then(result => console.log(result));
+```
+
+**Note**: BCC recipients are hidden from the main recipient and from each other. You can also set a default BCC in `config.ini`:
+
+```ini
+bcc = archive@example.com, admin@example.com
 ```
 
 ## Response Handling

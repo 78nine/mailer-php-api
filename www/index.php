@@ -30,6 +30,15 @@ function send_email($config) {
   if (isset($config['message_plain'])) {
     $mail->AltBody = $config['message_plain'];
   }
+  if (isset($config['bcc'])) {
+    $bcc_addresses = is_array($config['bcc']) ? $config['bcc'] : explode(',', $config['bcc']);
+    foreach ($bcc_addresses as $bcc_address) {
+      $bcc_address = trim($bcc_address);
+      if (!empty($bcc_address)) {
+        $mail->addBCC($bcc_address);
+      }
+    }
+  }
   if (isset($config['attachments']) && is_array($config['attachments'])) {
     foreach ($config['attachments'] as $attachment) {
       if (isset($attachment['content']) && isset($attachment['filename'])) {
@@ -98,6 +107,13 @@ foreach ($mail_config_keys as $key) {
     continue;
   }
   $mail_config[$key] = trim($request_data[$key] ?? $ini_config[$key]);
+}
+
+// Handle optional BCC from JSON or config
+if (isset($request_data['bcc'])) {
+  $mail_config['bcc'] = $request_data['bcc'];
+} elseif (isset($ini_config['bcc'])) {
+  $mail_config['bcc'] = $ini_config['bcc'];
 }
 
 // Handle attachments from JSON (optional)

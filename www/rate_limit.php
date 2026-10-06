@@ -43,7 +43,7 @@ function check_rate_limit($max_requests = 10, $time_window = 60) {
   
   // Check if limit exceeded
   if (count($requests) >= $max_requests) {
-    $oldest_request = min($requests);
+    $oldest_request = count($requests) > 0 ? min($requests) : $now;
     $retry_after = $time_window - ($now - $oldest_request);
     return [
       'allowed' => false,

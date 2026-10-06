@@ -1,0 +1,36 @@
+{
+  "name": "mailer-php-api/tests",
+  "description": "Send emails using an HTTP PHP API using PHPMailer.",
+  "type": "project",
+  "license": "LGPL-2.1-only",
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5",
+    "phpstan/phpstan": "^1.10"
+  },
+  "scripts": {
+    "test": "phpunit",
+    "test:coverage": "phpunit --coverage-html coverage",
+    "test:unit": "phpunit --testsuite='Unit Tests'",
+    "analyse": "phpstan analyse www --level=5"
+  },
+  "autoload": {
+    "files": [
+      "www/auth.php",
+      "www/bootstrap.php",
+      "www/rate_limit.php",
+      "www/validation.php",
+      "www/request.php",
+      "www/email.php",
+      "www/security.php",
+      "www/response.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+FROM php:8.2-cli
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /app
+
+# Copy application files
+COPY . /app/
+
+# Install PHP dependencies
+RUN composer install --no-interaction --prefer-dist
+
+# Run tests
+CMD ["./vendor/bin/phpunit", "--verbose"]

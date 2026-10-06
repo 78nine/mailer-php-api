@@ -22,7 +22,7 @@ function get_bearer_token() {
   if (empty($headers)) {
     return NULL;
   }
-  if (preg_match('/Bearer\s(\S+)/', $headers, $matches)) {
+  if (preg_match('/Bearer\s+(\S+)/', $headers, $matches)) {
     return $matches[1];
   }
 }

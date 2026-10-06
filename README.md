@@ -46,7 +46,15 @@ If you need to call the API from web browsers on different domains, enable CORS:
 ```ini
 [general]
 cors_enabled = true
-cors_origin = *  ; Allow all origins (or specify: https://yourdomain.com)
+
+; Option 1: Allow all origins (least secure)
+cors_origin = *
+
+; Option 2: Single origin
+cors_origin = https://yourdomain.com
+
+; Option 3: Multiple origins (comma-separated)
+cors_origin = https://yourdomain.com, https://app.yourdomain.com, https://another.com
 ```
 
 **Default**: CORS is disabled for security.
@@ -55,6 +63,9 @@ cors_origin = *  ; Allow all origins (or specify: https://yourdomain.com)
 - Accept preflight OPTIONS requests
 - Return appropriate `Access-Control-*` headers
 - Allow requests from specified origin(s)
+- For multiple origins, only matching origins receive CORS headers (with `Vary: Origin`)
+
+See [CORS_MULTIPLE_DOMAINS.md](CORS_MULTIPLE_DOMAINS.md) for detailed documentation
 
 ## Security Features
 

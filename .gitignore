@@ -1,2 +1,25 @@
 deploy.sh
 www/config.ini
+
+# Composer
+/vendor/
+composer.lock
+
+# PHPUnit
+.phpunit.result.cache
+/coverage/
+coverage.xml
+
+# PHPStan
+.phpstan.cache
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

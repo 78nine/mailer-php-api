@@ -91,6 +91,25 @@ Rate limiting can be disabled by setting `rate_limit_enabled = false`.
 }
 ```
 
+**400 Bad Request** - Invalid email address
+```json
+{
+  "error": "Invalid recipient email address"
+}
+```
+or
+```json
+{
+  "error": "Invalid sender email address"
+}
+```
+or
+```json
+{
+  "error": "Invalid BCC email address: invalid@"
+}
+```
+
 **400 Bad Request** - Email send failure
 ```text
 Mailer Error: SMTP Error: Could not authenticate.

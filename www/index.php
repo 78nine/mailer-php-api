@@ -20,6 +20,15 @@ require 'PHPMailer/src/SMTP.php';
 require_once('auth.php');
 require_once('rate_limit.php');
 
+function validate_email($email) {
+  $email = trim($email);
+  if (empty($email)) {
+    return false;
+  }
+  // Use PHP's built-in email validation
+  return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+}
+
 function send_email($config) {
   // echo print_r($config, true);
   $mail = new PHPMailer;
@@ -159,6 +168,31 @@ if (sizeof($missing_field_names) > 0) {
   http_response_code(400);
   echo json_encode(['error' => "Missing fields: {$missing_field_names_str}"]);
   exit;
+}
+
+// Validate email addresses
+if (!validate_email($mail_config['to_email'])) {
+  http_response_code(400);
+  echo json_encode(['error' => 'Invalid recipient email address']);
+  exit;
+}
+
+if (!validate_email($mail_config['from_email'])) {
+  http_response_code(400);
+  echo json_encode(['error' => 'Invalid sender email address']);
+  exit;
+}
+
+if (isset($mail_config['bcc'])) {
+  $bcc_addresses = is_array($mail_config['bcc']) ? $mail_config['bcc'] : explode(',', $mail_config['bcc']);
+  foreach ($bcc_addresses as $bcc_address) {
+    $bcc_address = trim($bcc_address);
+    if (!empty($bcc_address) && !validate_email($bcc_address)) {
+      http_response_code(400);
+      echo json_encode(['error' => "Invalid BCC email address: {$bcc_address}"]);
+      exit;
+    }
+  }
 }
 
 $result = send_email($mail_config);
